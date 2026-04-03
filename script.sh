@@ -184,7 +184,54 @@ echo "Installing latest Node.js..."
 nvm install --lts
 nvm use --lts
 
-source ~/.zshrc
+zsh -ic "source ~/.zshrc"
+
+# -----------------------------
+# scrcpy
+# -----------------------------
+
+echo "==> Installing scrcpy..."
+sudo apt update
+sudo apt install -y ffmpeg libsdl2-2.0-0 adb wget \
+    gcc git pkg-config meson ninja-build libsdl2-dev \
+    libavcodec-dev libavdevice-dev libavformat-dev libavutil-dev \
+    libswresample-dev libusb-1.0-0 libusb-1.0-0-dev
+
+echo "==> Cloning scrcpy..."
+if [ ! -d "scrcpy" ]; then
+    git clone https://github.com/Genymobile/scrcpy
+fi
+
+cd scrcpy
+
+echo "==> Building and installing scrcpy..."
+./install_release.sh
+
+echo "==> Adding scrcpy helper function to ~/.zshrc..."
+
+# Append function only if not already present
+if ! grep -q "scrcpy_full()" ~/.zshrc; then
+cat << 'EOF' >> ~/.zshrc
+
+# Scrcpy with mouse, keyboard, and audio
+mobile() {
+    scrcpy \
+        --audio-source=output \
+        --keyboard=uhid \
+        --mouse=uhid \
+        --max-size=1024 \
+        --video-bit-rate=18M \
+        --max-fps=60 \
+        --render-driver=opengl \
+        "$@"
+}
+
+EOF
+fi
+
+echo "==> Done!"
+echo "Restart your terminal or run: source ~/.zshrc"
+zsh -ic "source ~/.zshrc"
 
 # -----------------------------
 # Build tools
