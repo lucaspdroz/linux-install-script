@@ -246,4 +246,4 @@ sudo apt install -y build-essential
 echo "Installing steam..."
 sudo apt install -y steam
 
-echo "Setup complete!"
+echo "🎉🎉🎉 Setup complete! 🎉🎉🎉"
