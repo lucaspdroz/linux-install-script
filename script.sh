@@ -91,6 +91,50 @@ fi
 echo "🎉 Done! Next time you open Bash, it will automatically switch to Zsh."
 
 # -----------------------------
+#  Installing FiraCode Nerd Font
+# -----------------------------
+
+echo "📥 Installing FiraCode Nerd Font..."
+
+# Create fonts directory
+mkdir -p ~/.local/share/fonts
+cd /tmp
+
+# Download latest FiraCode Nerd Font
+curl -fLo FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
+
+# Unzip
+unzip -o FiraCode.zip -d firacode
+
+# Install fonts
+cp firacode/*.ttf ~/.local/share/fonts/
+
+# Refresh font cache
+fc-cache -fv
+
+echo "✅ Font installed."
+
+# Try to configure GNOME Terminal / Cinnamon Terminal
+if command -v gsettings >/dev/null; then
+    echo "🎨 Setting font in terminal..."
+
+    PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
+    PROFILE_PATH="/org/gnome/terminal/legacy/profiles:/:$PROFILE/"
+
+    gsettings set "org.gnome.Terminal.Legacy.Profile:$PROFILE_PATH" use-system-font false
+    gsettings set "org.gnome.Terminal.Legacy.Profile:$PROFILE_PATH" font 'FiraCode Nerd Font 12'
+
+    echo "✅ Terminal font updated."
+else
+    echo "⚠️ Could not auto-configure terminal."
+fi
+
+echo "🧪 Testing glyph:"
+echo ""
+
+echo "🚀 Done! Restart your terminal if needed."
+
+# -----------------------------
 # Fix ç (Gnome)
 # -----------------------------
 echo "Fixing ç character issue..."
@@ -147,5 +191,12 @@ source ~/.zshrc
 # -----------------------------
 echo "Installing build-essential..."
 sudo apt install -y build-essential
+
+
+# -----------------------------
+# steam
+# -----------------------------
+echo "Installing steam..."
+sudo apt install -y steam
 
 echo "Setup complete!"
