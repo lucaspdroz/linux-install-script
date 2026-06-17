@@ -234,6 +234,49 @@ echo "Restart your terminal or run: source ~/.zshrc"
 zsh -ic "source ~/.zshrc"
 
 # -----------------------------
+# Docker
+# -----------------------------
+
+echo "==> Updating package index and installing prerequisites..."
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+echo "==> Adding Docker's official GPG key..."
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo "==> Setting up the repository (mapping Mint to Ubuntu base)..."
+# O Linux Mint usa a variável UBUNTU_CODENAME no /etc/os-release
+. /etc/os-release
+UBUNTU_BASE=${UBUNTU_CODENAME:-$VERSION_CODENAME}
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $UBUNTU_BASE stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+echo "==> Installing Docker Engine, CLI, and Compose..."
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+echo "==> Managing Docker as a non-root user (Post-install)..."
+# Cria o grupo se não existir e adiciona o usuário atual
+sudo groupadd -f docker
+sudo usermod -aG docker $USER
+
+echo "==> Enabling and starting Docker service..."
+sudo systemctl enable docker
+sudo systemctl start docker
+
+echo "==> Running Hello-World container..."
+# Nota: Como o grupo acabou de ser associado, precisamos do 'sg' 
+# para rodar o comando com o novo grupo sem deslogar da sessão atual.
+sg docker -c "docker run hello-world"
+
+echo "==> Done!"
+echo "Para aplicar a permissão do grupo permanentemente no seu terminal atual, execute:"
+echo "newgrp docker"
+
+# -----------------------------
 # Build tools
 # -----------------------------
 echo "Installing build-essential..."
