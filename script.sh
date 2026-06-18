@@ -260,8 +260,9 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 
 echo "==> Managing Docker as a non-root user (Post-install)..."
 # Cria o grupo se não existir e adiciona o usuário atual
-sudo groupadd -f docker
+sudo groupadd docker
 sudo usermod -aG docker $USER
+newgrp docker
 
 echo "==> Enabling and starting Docker service..."
 sudo systemctl enable docker
@@ -270,7 +271,7 @@ sudo systemctl start docker
 echo "==> Running Hello-World container..."
 # Nota: Como o grupo acabou de ser associado, precisamos do 'sg' 
 # para rodar o comando com o novo grupo sem deslogar da sessão atual.
-sg docker -c "docker run hello-world"
+docker run hello-world
 
 echo "==> Done!"
 echo "Para aplicar a permissão do grupo permanentemente no seu terminal atual, execute:"
