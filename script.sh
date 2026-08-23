@@ -67,13 +67,43 @@ fi
 
 echo "👤 Configuring user avatar..."
 
-if [ -n "$AVATAR_URL" ]; then
-    curl -fL "$AVATAR_URL" -o "$AVATAR_FILE"
-    chmod 644 "$AVATAR_FILE"
+AVATAR_URL="https://github.com/lucaspdroz/linux-install-script/blob/main/wallpapers/avatar.jpg?raw=true"
+AVATAR_FILE="$WALLPAPER_DIR/avatar.jpg"
+AVATAR_ICON="/var/lib/AccountsService/icons/$USER"
+AVATAR_ACCOUNT="/var/lib/AccountsService/users/$USER"
 
-    # Define a imagem como avatar do usuário
+if [ -n "$AVATAR_URL" ]; then
+    echo "📥 Downloading avatar..."
+    curl -fL "$AVATAR_URL" -o "$AVATAR_FILE"
+
+    # ~/.face — compatibilidade
     cp "$AVATAR_FILE" "$HOME/.face"
     chmod 644 "$HOME/.face"
+
+    # AccountsService — Cinnamon / LightDM
+    sudo mkdir -p /var/lib/AccountsService/icons
+
+    sudo cp "$AVATAR_FILE" "$AVATAR_ICON"
+    sudo chmod 644 "$AVATAR_ICON"
+
+    # Configura o AccountsService para usar o avatar
+    if [ -f "$AVATAR_ACCOUNT" ]; then
+        if grep -q '^Icon=' "$AVATAR_ACCOUNT"; then
+            sudo sed -i "s|^Icon=.*|Icon=$AVATAR_ICON|" "$AVATAR_ACCOUNT"
+        else
+            echo "Icon=$AVATAR_ICON" | sudo tee -a "$AVATAR_ACCOUNT" > /dev/null
+        fi
+    else
+        sudo mkdir -p /var/lib/AccountsService/users
+
+        sudo tee "$AVATAR_ACCOUNT" > /dev/null <<EOF
+[User]
+Icon=$AVATAR_ICON
+SystemAccount=false
+EOF
+
+        sudo chmod 644 "$AVATAR_ACCOUNT"
+    fi
 
     echo "✅ User avatar configured."
 else
