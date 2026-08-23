@@ -114,6 +114,42 @@ fc-cache -fv
 
 echo "✅ Font installed."
 
+# -----------------------------
+# VS Code integrated terminal font
+# -----------------------------
+echo "🎨 Configuring FiraCode Nerd Font in VS Code terminal..."
+
+VSCODE_USER_DIR="$HOME/.config/Code/User"
+VSCODE_SETTINGS="$VSCODE_USER_DIR/settings.json"
+
+mkdir -p "$VSCODE_USER_DIR"
+
+if [ -f "$VSCODE_SETTINGS" ]; then
+    python3 - "$VSCODE_SETTINGS" << 'PY'
+import json
+import sys
+
+path = sys.argv[1]
+
+with open(path, "r", encoding="utf-8") as f:
+    settings = json.load(f)
+
+settings["terminal.integrated.fontFamily"] = "FiraCode Nerd Font"
+
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(settings, f, indent=4, ensure_ascii=False)
+    f.write("\n")
+PY
+else
+    cat > "$VSCODE_SETTINGS" << 'EOF'
+{
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font"
+}
+EOF
+fi
+
+echo "✅ VS Code terminal font configured."
+
 # Try to configure GNOME Terminal / Cinnamon Terminal
 if command -v gsettings >/dev/null; then
     echo "🎨 Setting font in terminal..."
@@ -174,11 +210,21 @@ sudo apt install -y steam
 # Node.js (via NVM)
 # -----------------------------
 echo "Installing NVM (Node Version Manager)..."
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | bash
 
 # Load NVM immediately (important for scripts)
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+# Ensure NVM is available in Zsh (the default shell configured above)
+if ! grep -q 'NVM_DIR=.*\.nvm' "$HOME/.zshrc"; then
+cat << 'EOF' >> "$HOME/.zshrc"
+
+# NVM (Node Version Manager)
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+EOF
+fi
 
 echo "Installing latest Node.js..."
 nvm install --lts
