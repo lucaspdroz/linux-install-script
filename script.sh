@@ -54,7 +54,7 @@ if [ -n "$WALLPAPER_URL" ]; then
         gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_FILE" || true
         gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER_FILE" || true
         gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
-        gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark' || true
+        gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Purple' || true    
     fi
 
     echo "✅ Wallpaper and dark theme configured."
