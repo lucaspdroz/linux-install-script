@@ -34,6 +34,53 @@ git config --global user.name "Pacheco"
 git config --global user.email "lucaspdroz@gmail.com"
 
 # -----------------------------
+# Desktop / Wallpaper
+# -----------------------------
+
+# URL do wallpaper que será baixado e aplicado
+WALLPAPER_URL="https://github.com/lucaspdroz/linux-install-script/blob/main/wallpapers/ada.jpg?raw=true"
+WALLPAPER_DIR="$HOME/Pictures"
+WALLPAPER_FILE="$WALLPAPER_DIR/ada.jpg"
+
+AVATAR_URL="https://github.com/lucaspdroz/linux-install-script/blob/main/wallpapers/avatar.jpg?raw=true"
+AVATAR_FILE="$WALLPAPER_DIR/avatar.jpg"
+
+echo "🖼️ Configuring dark theme and wallpaper..."
+mkdir -p "$WALLPAPER_DIR"
+
+if [ -n "$WALLPAPER_URL" ]; then
+    echo "📥 Downloading wallpaper..."
+    curl -fL "$WALLPAPER_URL" -o "$WALLPAPER_FILE"
+
+    if command -v gsettings >/dev/null; then
+        gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER_FILE" || true
+        gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER_FILE" || true
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' || true
+        gsettings set org.cinnamon.desktop.interface gtk-theme 'Mint-Y-Dark' || true
+    fi
+
+    echo "✅ Wallpaper and dark theme configured."
+else
+    echo "⚠️ WALLPAPER_URL is empty; skipping wallpaper download."
+fi
+
+
+echo "👤 Configuring user avatar..."
+
+if [ -n "$AVATAR_URL" ]; then
+    curl -fL "$AVATAR_URL" -o "$AVATAR_FILE"
+    chmod 644 "$AVATAR_FILE"
+
+    # Define a imagem como avatar do usuário
+    cp "$AVATAR_FILE" "$HOME/.face"
+    chmod 644 "$HOME/.face"
+
+    echo "✅ User avatar configured."
+else
+    echo "⚠️ AVATAR_URL is empty; skipping avatar."
+fi
+
+# -----------------------------
 # Zsh + Oh My Zsh
 # -----------------------------
 echo "Installing Zsh..."
